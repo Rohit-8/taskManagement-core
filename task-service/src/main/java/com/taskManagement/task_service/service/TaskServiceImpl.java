@@ -1,14 +1,17 @@
 package com.taskManagement.task_service.service;
 
 import com.taskManagement.task_service.dto.CreateTaskRequest;
+import com.taskManagement.task_service.dto.PageResponse;
 import com.taskManagement.task_service.dto.UpdateTaskRequest;
 import com.taskManagement.task_service.entity.Task;
 import com.taskManagement.task_service.interfaces.TaskService;
 import com.taskManagement.task_service.repository.TaskRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +21,33 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
+    private static final List<String> allowedSortFields = Arrays.asList(
+            "title", "description", "assignedBy", "assignedTo", "createdAt"
+    );
+
     @Override
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
+    }
+
+    @Override
+    public PageResponse<Task> getAllTasks(int page, int size, String sortBy, String sortDir) {
+        if (!allowedSortFields.contains(sortBy)) {
+            throw new IllegalArgumentException("Invalid sortBy field: " + sortBy);
+        }
+
+        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+        Page<Task> taskPage = taskRepository.findAll(pageable);
+
+        return new PageResponse<>(
+                taskPage.getContent(),
+                taskPage.getNumber(),
+                taskPage.getSize(),
+                taskPage.getTotalElements(),
+                taskPage.getTotalPages(),
+                taskPage.isLast()
+        );
     }
 
     @Override
@@ -59,5 +86,4 @@ public class TaskServiceImpl implements TaskService {
         taskRepository.deleteById(id);
         return task;
     }
-
 }
