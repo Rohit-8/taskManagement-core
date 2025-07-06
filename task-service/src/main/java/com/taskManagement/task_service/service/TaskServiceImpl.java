@@ -20,7 +20,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     private static final List<String> allowedSortFields = Arrays.asList(
-            "title", "description", "assignedBy", "assignedTo", "createdAt", "priority"
+            "title", "description", "assignedBy", "assignedTo", "createdAt", "priority", "category"
     );
 
     @Override
@@ -43,6 +43,13 @@ public class TaskServiceImpl implements TaskService {
             } else {
                 taskPage = taskRepository.findAllOrderByPriorityAsc(pageable);
             }
+        } else if ("category".equalsIgnoreCase(sortBy)) {
+            pageable = PageRequest.of(page, size);
+            if ("desc".equalsIgnoreCase(sortDir)) {
+                taskPage = taskRepository.findAllOrderByCategoryDesc(pageable);
+            } else {
+                taskPage = taskRepository.findAllOrderByCategoryAsc(pageable);
+            }
         } else {
             Sort sort = sortDir.equalsIgnoreCase("asc")
                     ? Sort.by(sortBy).ascending()
@@ -50,7 +57,6 @@ public class TaskServiceImpl implements TaskService {
             pageable = PageRequest.of(page, size, sort);
             taskPage = taskRepository.findAll(pageable);
         }
-
         return new PageResponse<>(
                 taskPage.getContent(),
                 taskPage.getNumber(),
@@ -77,6 +83,7 @@ public class TaskServiceImpl implements TaskService {
                 .assignedBy(createTaskRequest.getAssignedBy())
                 .createdAt(LocalDateTime.now())
                 .priority(createTaskRequest.getPriority())
+                .category(createTaskRequest.getCategory())
                 .build();
         return taskRepository.save(request);
     }
@@ -90,6 +97,7 @@ public class TaskServiceImpl implements TaskService {
         task.setAssignedBy(updateTaskRequest.getAssignedBy());
         task.setAssignedTo(updateTaskRequest.getAssignedTo());
         task.setPriority(updateTaskRequest.getPriority());
+        task.setCategory(updateTaskRequest.getCategory());
         return taskRepository.save(task);
     }
 

@@ -1,5 +1,6 @@
 package com.taskManagement.task_service.entity;
 
+import com.taskManagement.task_service.enums.Category;
 import com.taskManagement.task_service.enums.Priority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -30,4 +31,7 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     private Priority priority;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
 }

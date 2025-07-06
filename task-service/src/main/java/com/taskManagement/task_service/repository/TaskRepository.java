@@ -25,4 +25,20 @@ public interface TaskRepository extends JpaRepository<Task,Long> {
             "ELSE 4 END")
     Page<Task> findAllOrderByPriorityDesc(Pageable pageable);
 
+    @Query("SELECT t FROM Task t ORDER BY CASE t.category \n" +
+            "WHEN 'BUG' THEN 1 \n" +
+            "WHEN 'FEATURE' THEN 2 \n" +
+            "WHEN 'IMPROVEMENT' THEN 3 \n" +
+            "WHEN 'RESEARCH' THEN 4 \n" +
+            "ELSE 5 END")
+    Page<Task> findAllOrderByCategoryAsc(Pageable pageable);
+
+    @Query("SELECT t FROM Task t ORDER BY CASE t.category \n" +
+            "WHEN 'RESEARCH' THEN 1 \n" +
+            "WHEN 'IMPROVEMENT' THEN 2 \n" +
+            "WHEN 'FEATURE' THEN 3 \n" +
+            "WHEN 'BUG' THEN 4 \n" +
+            "ELSE 5 END")
+    Page<Task> findAllOrderByCategoryDesc(Pageable pageable);
+
 }
