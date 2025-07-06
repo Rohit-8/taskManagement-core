@@ -22,7 +22,7 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     private static final List<String> allowedSortFields = Arrays.asList(
-            "title", "description", "assignedBy", "assignedTo", "createdAt"
+            "title", "description", "assignedBy", "assignedTo", "createdAt", "priority"
     );
 
     @Override
@@ -64,6 +64,7 @@ public class TaskServiceImpl implements TaskService {
                 .assignedTo(createTaskRequest.getAssignedTo())
                 .assignedBy(createTaskRequest.getAssignedBy())
                 .createdAt(LocalDateTime.now())
+                .priority(createTaskRequest.getPriority())
                 .build();
         return taskRepository.save(request);
     }
@@ -76,6 +77,7 @@ public class TaskServiceImpl implements TaskService {
         task.setDescription(updateTaskRequest.getDescription());
         task.setAssignedBy(updateTaskRequest.getAssignedBy());
         task.setAssignedTo(updateTaskRequest.getAssignedTo());
+        task.setPriority(updateTaskRequest.getPriority());
         return taskRepository.save(task);
     }
 

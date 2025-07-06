@@ -1,5 +1,6 @@
 package com.taskManagement.task_service.dto;
 
+import com.taskManagement.task_service.enums.Priority;
 import lombok.Data;
 
 @Data
@@ -10,4 +11,5 @@ public class CreateTaskRequest {
     private String assignedBy;
     private String assignedTo;
     private String createdBy;
+    private Priority priority;
 }

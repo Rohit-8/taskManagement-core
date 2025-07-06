@@ -1,5 +1,6 @@
 package com.taskManagement.task_service.entity;
 
+import com.taskManagement.task_service.enums.Priority;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -26,4 +27,7 @@ public class Task {
     private String assignedTo;
     private LocalDateTime createdAt;
     private String createdBy;
+
+    @Enumerated(EnumType.STRING)
+    private Priority priority;
 }
