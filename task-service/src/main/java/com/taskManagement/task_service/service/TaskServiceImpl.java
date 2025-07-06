@@ -11,9 +11,7 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -35,10 +33,23 @@ public class TaskServiceImpl implements TaskService {
         if (!allowedSortFields.contains(sortBy)) {
             throw new IllegalArgumentException("Invalid sortBy field: " + sortBy);
         }
+        Pageable pageable;
+        Page<Task> taskPage;
 
-        Sort sort = sortDir.equalsIgnoreCase("asc") ? Sort.by(sortBy).ascending() : Sort.by(sortBy).descending();
-        Pageable pageable = PageRequest.of(page, size, sort);
-        Page<Task> taskPage = taskRepository.findAll(pageable);
+        if ("priority".equalsIgnoreCase(sortBy)) {
+            pageable = PageRequest.of(page, size);
+            if ("desc".equalsIgnoreCase(sortDir)) {
+                taskPage = taskRepository.findAllOrderByPriorityDesc(pageable);
+            } else {
+                taskPage = taskRepository.findAllOrderByPriorityAsc(pageable);
+            }
+        } else {
+            Sort sort = sortDir.equalsIgnoreCase("asc")
+                    ? Sort.by(sortBy).ascending()
+                    : Sort.by(sortBy).descending();
+            pageable = PageRequest.of(page, size, sort);
+            taskPage = taskRepository.findAll(pageable);
+        }
 
         return new PageResponse<>(
                 taskPage.getContent(),
@@ -47,8 +58,9 @@ public class TaskServiceImpl implements TaskService {
                 taskPage.getTotalElements(),
                 taskPage.getTotalPages(),
                 taskPage.isLast()
-        );
+            );
     }
+
 
     @Override
     public Optional<Task> fetchTaskById(Long id) {
